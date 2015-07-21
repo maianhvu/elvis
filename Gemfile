@@ -24,6 +24,15 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Using Devise for authentication
 gem 'devise'
 
+# Use HAML Templating engine
+gem 'haml-rails'
+# Use Compass
+gem 'compass-rails'
+# Use Foundation
+gem 'foundation-rails'
+# Use ReactJS
+gem 'react-rails', '~> 1.0'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

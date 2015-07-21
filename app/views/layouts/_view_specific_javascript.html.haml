@@ -1,0 +1,3 @@
+- if @view_js && !@view_js.empty?
+  - @view_js.each do |j|
+    = javascript_include_tag j

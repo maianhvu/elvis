@@ -1,0 +1,28 @@
+-# include view specific js
+- @view_js = ['pages/index']
+-#
+.splash-wrapper
+  .contain-to-grid
+    -# menubar
+    %nav.top-bar{role: 'navigation', data: { topbar: true }}
+      -# logo
+      %ul.title-area
+        %li.name
+          %h1= link_to 'Elvis', root_path
+      -# links
+      %section.top-bar-section
+        %ul.right
+          %li= link_to 'Features', '#'
+          %li= link_to 'Sign In', '#'
+          %li.active= link_to 'Register', '#'
+
+  %section.splash.container
+    -# splash text
+    .row
+      .small-12.medium-10.large-8.medium-offset-1.large-offset-2.columns.text-center
+        %h2
+          Effortlessly manage
+          %br/
+          your NUS timetable
+    -# actions
+    .row#modules-mount-point
