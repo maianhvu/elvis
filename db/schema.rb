@@ -11,7 +11,41 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150720095202) do
+ActiveRecord::Schema.define(version: 20150723154853) do
+
+  create_table "acadyears", force: :cascade do |t|
+    t.integer  "start_year"
+    t.integer  "end_year"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "semesters", force: :cascade do |t|
+    t.integer  "ordinal"
+    t.integer  "acadyear_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "semesters", ["acadyear_id"], name: "index_semesters_on_acadyear_id"
+
+  create_table "timeslots", force: :cascade do |t|
+    t.string   "module_code"
+    t.string   "lesson_type"
+    t.string   "lesson_code"
+    t.integer  "day_code"
+    t.float    "start_time"
+    t.float    "end_time"
+    t.string   "venue"
+    t.string   "week_text"
+    t.integer  "user_id"
+    t.integer  "semester_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "timeslots", ["semester_id"], name: "index_timeslots_on_semester_id"
+  add_index "timeslots", ["user_id"], name: "index_timeslots_on_user_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
