@@ -8,4 +8,7 @@ Rails.application.routes.draw do
 
   # Devise routes
   devise_for :users
+
+  #Resource
+  resources :timeslots, only: [ :index, :show, :create, :update ]
 end
