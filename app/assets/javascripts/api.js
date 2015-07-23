@@ -75,6 +75,13 @@ $(function() {
     });
   };
 
+  /**
+   * Wrapper methods for logger
+   */
+  helper.logger = function(args) {
+    console.log(args);
+  }
+
   // declare API
   var api = function() {};
   //------------------------------------------------------------------------------------------------------------
@@ -96,10 +103,7 @@ $(function() {
    * @param callback {Function}: The function to call upon successful data query
    */
   api.fetchData = function(callback) {
-    if (callback === undefined) {
-      // default callback to logging the results
-      callback = function(data) { console.log(data); }
-    }
+    if (typeof callback === 'undefined') callback = helper.logger;
     // start querying
     $.getJSON(api.urlFor.timetable, callback);
   }
@@ -107,6 +111,7 @@ $(function() {
   /**
    * Saves the data to cache
    * @param data {JSONArray} Raw data from server
+   * @return moduleCodes List of the modules saved
    */
   api.cacheData = function(data) {
     var moduleCodes = [];
@@ -122,6 +127,43 @@ $(function() {
     sessionStorage.setItem(api.keyFor.modulesList, moduleCodes.join(","));
     // mark the data as saved
     sessionStorage.setItem(api.keyFor.apiDataPresent, true);
+    // return the list of the codes of the modules saved
+    return moduleCodes;
+  }
+
+  /**
+   * Get data and perform operations on them:
+   * 1. Check if data is present
+   * 2. If data present, perform callback on data
+   * 3. If data not present, fetch data first then perform callback
+   * @param callback {Function} operations to perform on the data
+   */
+  api.getData = function(callback) {
+    if (typeof callback === 'undefined') callback = helper.logger;
+    // check for data
+    if (api.hasData()) {
+      console.log("Getting data from sessionStorage");
+      var modules = api.modulesList();
+      var data = {};
+      modules.forEach(function(module) {
+        data[module] = JSON.parse(sessionStorage.getItem(module));
+      });
+      callback(data);
+      return;
+    }
+    // since the if statement terminates with a return
+    // code will only reach here if api doesn't have data
+    api.fetchData(function(data) {
+      console.log("Getting data from remote API");
+      // caches the data first
+      var modulesList = api.cacheData(data);
+      // then fetch data
+      var data = {};
+      modulesList.forEach(function(module) {
+        data[module] = JSON.parse(sessionStorage.getItem(module));
+      });
+      callback(data);
+    });
   }
 
   /**
@@ -155,6 +197,23 @@ $(function() {
     sessionStorage.removeItem(api.keyFor.modulesList);
     // deletes the api presence flag
     sessionStorage.removeItem(api.keyFor.apiDataPresent);
+  }
+
+  //-------------------------------------------------------------------------------------------------
+  // SPECIFIC API FUNCTIONS
+  //-------------------------------------------------------------------------------------------------
+  /**
+   * Return an array of modules identities (code + title)
+   */
+  api.moduleIdentities = function(callback) {
+    if (typeof callback === 'undefined') callback = helper.logger;
+    api.getData(function(data) {
+      var modules = Object.keys(data);
+      callback(modules.map(function(module) { return {
+        code: module,
+        title: data[module].title,
+      }; }));
+    });
   }
 
   // export API to global scope
