@@ -1,4 +1,7 @@
 $(function() {
+
+  var inputUpdateTimer = null;
+
   //-------------------------------------------------------------------------------------------------
   // REACT JS COMPONENTS
   //-------------------------------------------------------------------------------------------------
@@ -20,23 +23,38 @@ $(function() {
       this.setState({
         commitLabel: this.props.addModuleText
       });
+      React.findDOMNode(this.refs.module).focus();
     },
     // check input
     checkInput: function(e) {
       var input = React.findDOMNode(this.refs.module).value.trim();
       // modify value of button
       if (this.props.urlRegExp.test(input) && this.state.commitLabel === this.props.addModuleText) {
+        // if the regexp for url passes, and the label is incorrect
+        // sets the label
         this.setState({
           commitLabel: this.props.importModulesText,
           adding: false,
         });
-      } else if (!this.props.urlRegExp.test(input) && this.state.commitLabel === this.props.importModulesText) {
-        this.setState({
-          commitLabel: this.props.addModuleText,
-          adding: true,
-        });
+      } else if (!this.props.urlRegExp.test(input)) {
+        // if the regexp fails, which means user adding url manually
+        // check if using correct label
+        if (this.state.commitLabel === this.props.importModulesText) {
+          this.setState({
+            commitLabel: this.props.addModuleText,
+            adding: true,
+          });
+        }
+        // then, in any case, filter input
         this.props.onInputChange(input);
       }
+      inputUpdateTimer = null;
+    },
+    queueInputCheck: function() {
+      if (inputUpdateTimer !== null) {
+        window.clearTimeout(inputUpdateTimer);
+      }
+      inputUpdateTimer = window.setTimeout(this.checkInput, 200);
     },
     // render the component
     render: function() {
@@ -45,7 +63,7 @@ $(function() {
         type: "text",
         placeholder: "Module Code, Module Title or NUSMods Share Link",
         ref: "module",
-        onChange: this.checkInput
+        onChange: this.queueInputCheck
       };
       if (this.props.loading) {
         inputOptions.disabled = "disabled";
@@ -73,15 +91,20 @@ $(function() {
   var ModulesList = React.createClass({
     render: function() {
       // map the data to the nodes to display
-      var moduleNodes = this.props.data.map(function(module) {
-        var colour = moduleColourHash(module.code);
-        return (
-          <li key={module.code}>
-            <div className="module-code" style={{backgroundColor: colour}}>{module.code}</div>
-            <div className="module-title">{module.title}</div>
-          </li>
-        );
-      });
+      var moduleNodes;
+      if (this.props.data.length !== 0) {
+          moduleNodes = this.props.data.map(function(module) {
+          var colour = moduleColourHash(module.code);
+          return (
+            <li key={module.code}>
+              <div className="module-code" style={{backgroundColor: colour}}>{module.code}</div>
+              <div className="module-title">{module.title}</div>
+            </li>
+          );
+        });
+      } else {
+        moduleNodes = <li>No modules found.</li>
+      }
       // display the nodes
       return (
         <ul className="modules-list">
@@ -128,11 +151,15 @@ $(function() {
       // filter data
       var filteredData;
       if (this.state.filter === "") {
-        filteredData = this.state.data.slice(0, this.props.searchLimit);
+        filteredData = this.state.data;
       } else {
-        filteredData = [];
-        console.log(this.state.filter);
+        var filterRegExp = new RegExp(this.state.filter, 'i');
+        var filterFunc = function(module) {
+          return filterRegExp.test(module.code + ' ' + module.title);
+        }
+        filteredData = $.grep(this.state.data, filterFunc);
       }
+      filteredData = filteredData.limit(this.props.searchLimit);
       // render the element
       return (
         <div className="modules-box">
