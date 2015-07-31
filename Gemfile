@@ -28,8 +28,6 @@ gem 'devise'
 gem 'haml-rails'
 # Use Compass
 gem 'compass-rails'
-# Use Foundation
-gem 'foundation-rails'
 # Use ReactJS
 gem 'react-rails', '~> 1.0'
 

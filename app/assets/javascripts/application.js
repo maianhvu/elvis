@@ -12,7 +12,6 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require foundation
 //= require turbolinks
 //= require react
 //= require react_ujs
@@ -20,5 +19,3 @@
 //= require classnames
 //= require_tree .
 //= stub pages
-
-$(function(){ $(document).foundation(); });
