@@ -1,28 +1,23 @@
 -# include view specific js
-- @view_js = ['pages/index']
--#
-.splash-wrapper
-  .contain-to-grid
-    -# menubar
-    %nav.top-bar{role: 'navigation', data: { topbar: true }}
-      -# logo
-      %ul.title-area
-        %li.name
-          %h1= link_to 'Elvis', root_path
-      -# links
-      %section.top-bar-section
-        %ul.right
-          %li= link_to 'Features', '#'
-          %li= link_to 'Sign In', '#'
-          %li.active= link_to 'Register', '#'
+-# @view_js = ['pages/index']
+%header.container
+  .top-bar
+    = link_to root_path, class: 'logo' do
+      .logo-img
+        = image_tag 'shared/logo.svg', alt: 'Elvis', class: 'responsive'
+      .logo-text
+        %h1 Elvis
+    %nav
+      = link_to 'Features', '#'
+      = link_to 'Sign In', '#'
+      = link_to 'Register', '#', class: 'action'
 
-  %section.splash.container
-    -# splash text
-    .row
-      .small-12.medium-10.large-8.medium-offset-1.large-offset-2.columns.text-center
-        %h2
-          Effortlessly manage
-          %br/
-          your NUS timetable
-    -# actions
-    .row#modules-mount-point
+%section.splash.container
+  %h2
+    Planning for your NUS modules
+    %br/
+    has never been this easy.
+  = link_to '#' do
+    %button.action
+      Start Now
+
