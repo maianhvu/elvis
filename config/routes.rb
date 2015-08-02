@@ -10,5 +10,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   #Resource
-  resources :timeslots, only: [ :index, :show, :create, :update ]
+  namespace :api, path: '/', constraints: { subdomain: 'api' } do
+    resources :timeslots, only: [ :index, :show, :create, :update ]
+  end
 end
