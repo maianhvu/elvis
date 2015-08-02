@@ -11,6 +11,6 @@ Rails.application.routes.draw do
 
   #Resource
   namespace :api, path: '/', constraints: { subdomain: 'api' } do
-    resources :timeslots, only: [ :index, :show, :create, :update ]
+    resources :timeslots, only: [ :index, :show, :update ]
   end
 end
