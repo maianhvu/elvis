@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150723154853) do
+ActiveRecord::Schema.define(version: 20150802090020) do
 
   create_table "acadyears", force: :cascade do |t|
     t.integer  "start_year"
@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(version: 20150723154853) do
   create_table "timeslots", force: :cascade do |t|
     t.string   "module_code"
     t.string   "lesson_type"
-    t.string   "lesson_code"
+    t.integer  "class_no"
     t.integer  "day_code"
     t.float    "start_time"
     t.float    "end_time"
