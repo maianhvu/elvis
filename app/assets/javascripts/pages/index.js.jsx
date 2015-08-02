@@ -56,14 +56,27 @@ $(function() {
       }
       inputUpdateTimer = window.setTimeout(this.checkInput, 200);
     },
+    // toggle modules list visibility
+    showModulesList: function() {
+      this.props.setModulesListVisibility(true);
+    },
+    hideModulesList: function() {
+      window.setTimeout(function() {
+        React.findDOMNode(this.refs.module).value = "";
+        this.props.setModulesListVisibility(false);
+      }.bind(this), 100);
+    },
     // render the component
     render: function() {
       var inputField, inputOptions;
       inputOptions = {
         type: "text",
-        placeholder: "Module Code, Module Title or NUSMods Share Link",
+        placeholder: "Module Code, Title or NUSMods Share Link",
         ref: "module",
-        onChange: this.queueInputCheck
+        onChange: this.queueInputCheck,
+        onFocus: this.showModulesList,
+        onBlur: this.hideModulesList,
+        className: "search-box has-postfix"
       };
       if (this.props.loading) {
         inputOptions.disabled = "disabled";
@@ -72,16 +85,13 @@ $(function() {
       inputField = React.createElement('input', inputOptions);
       return (
         <form className="modules-form">
-          <div className="row collapse postfix-radius">
-            {/* input */}
-            <div className="small-10 columns">
-              {inputField}
-            </div>
-            {/* commit */}
-            <div className="small-2 columns">
-              <input type="submit" value={this.state.commitLabel} ref="commit" className="button postfix" />
-            </div>
+          {/* input */}
+          <div className="search-box">
+            <i className="fa fa-search" />
+            {inputField}
           </div>
+          {/* commit */}
+          <input type="submit" value={this.state.commitLabel} ref="commit" className="button postfix" />
         </form>
       );
     }
@@ -89,25 +99,41 @@ $(function() {
 
   // ModulesList
   var ModulesList = React.createClass({
+    getDefaultProps: function() { return {
+      itemHeight: 32,
+    }; },
+    // trigger the add module functionality
+    addModule: function(e) {
+      var match = e.dispatchMarker.match(/\$(.+)\./);
+      if (!match) return;
+      console.log(API.dataForModule(match[1]));
+    },
     render: function() {
       // map the data to the nodes to display
-      var moduleNodes;
+      var moduleNodes, height;
       if (this.props.data.length !== 0) {
-          moduleNodes = this.props.data.map(function(module) {
+        height = this.props.data.length;
+        moduleNodes = this.props.data.map(function(module) {
           var colour = moduleColourHash(module.code);
           return (
-            <li key={module.code}>
+            <li key={module.code} onClick={this.addModule}>
               <div className="module-code" style={{backgroundColor: colour}}>{module.code}</div>
               <div className="module-title">{module.title}</div>
             </li>
           );
-        });
+        }.bind(this));
       } else {
-        moduleNodes = <li>No modules found.</li>
+        height = 1;
+        moduleNodes = (<li className="empty-item">No modules found.</li>);
       }
+      var style = {
+        height: (height * (this.props.itemHeight + 1)).toString() + "px",
+        display: this.props.visibility ? "block" : "none",
+        opacity: this.props.visibility ? 1 : 0,
+      };
       // display the nodes
       return (
-        <ul className="modules-list">
+        <ul className="modules-list" style={style}>
           {moduleNodes}
         </ul>
       );
@@ -134,11 +160,16 @@ $(function() {
     handleInputChange: function(input) {
       this.setState({ filter: input.trim() });
     },
+    // show or hide modules list
+    setModulesListVisibility: function(visible) {
+      this.setState({ modulesListVisible: visible });
+    },
     // initial state
     getInitialState: function() { return {
       loading: true,
       data: [],
       filter: "",
+      modulesListVisible: false,
     }; },
     // component did mount
     componentDidMount: function() {
@@ -146,8 +177,6 @@ $(function() {
     },
     // render
     render: function() {
-      // define classNames for both subcomponents
-      var containerClasses = classNames('small-12', 'medium-8', 'large-6', 'medium-offset-2', 'large-offset-3', 'columns');
       // filter data
       var filteredData;
       if (this.state.filter === "") {
@@ -163,12 +192,8 @@ $(function() {
       // render the element
       return (
         <div className="modules-box">
-          <div className="row"><div className={containerClasses}>
-            <ModulesForm loading={this.state.loading} onInputChange={this.handleInputChange} />
-          </div></div>
-          <div className="row"><div className={containerClasses}>
-            <ModulesList data={filteredData} />
-          </div></div>
+          <ModulesForm loading={this.state.loading} onInputChange={this.handleInputChange} setModulesListVisibility={this.setModulesListVisibility} />
+          <ModulesList data={filteredData} visibility={this.state.modulesListVisible} />
         </div>
       );
     }
@@ -183,5 +208,10 @@ $(function() {
       <ModulesBox />,
       document.getElementById('modules-mount-point')
     );
+    // Set onClick action for Action button
+    $('#start-now').click(function() {
+      $('.top-bar').addClass('active');
+      $('.splash').slideUp(250);
+    });
   });
 });

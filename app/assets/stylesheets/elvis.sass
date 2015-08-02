@@ -65,10 +65,52 @@ input[type="submit"]
   background: $bg
   +border-radius(.25em)
   margin-top: 1em
+  +transition(background 0.25s ease-out 0s)
+
+  &:hover
+    background: scale-lightness($bg, 10%)
 
   &:active
-    border-bottom: none
+    border-bottom-width: 0
     +transform(translateY($bevel))
+
+  &.postfix
+    margin: 0
+    border-top-left-radius: 0
+    border-bottom-left-radius: 0
+    height: 2.1em
+    line-height: .8
+    display: inline-block
+    float: left
+    border-bottom: none
+    padding: 0.25em 1em
+    text-transform: none
+    background-color: $primary-color
+
+input[type="text"],
+input[type="email"],
+input[type="password"]
+  border: 1px solid $primary-color
+  outline: none
+  padding: .3em
+
+  &.has-postfix
+    display: inline-block
+    float: left
+
+.search-box
+  position: relative
+  input[type="text"]
+    padding-left: 1.8em
+  i.fa-search
+    position: absolute
+    $size: 1em
+    width: $size
+    height: $size
+    left: .5em
+    top: .5em
+    z-index: 1
+    color: $primary-color
 //-------------------------------------------------------------------------------------------------
 // 2. USEFUL CLASSES
 //-------------------------------------------------------------------------------------------------
@@ -102,6 +144,7 @@ header
   margin: auto
   +clearfix
   +text(center)
+  //overflow: visible
 
   .logo
     .logo-img,
@@ -119,6 +162,11 @@ header
 @media #{$medium-up}
   .top-bar
     +text(left)
+    margin-top: 3em
+    +transition(margin-top 0.25s ease-out 0s)
+
+    &.active
+      margin-top: 0
 
     .logo,
     nav
@@ -146,15 +194,96 @@ header
           border: 2px solid $primary-color
           color: $primary-color
           padding: .25em 1em
+          font-weight: 600
           +border-radius(.5em)
 
           &:hover
             color: white
             background-color: $primary-color
 
+    .modules-box
+      display: none
+
+      .search-box,
+      form
+        +clearfix
+    // .topbar.active
+    &.active
+      .logo-text
+        display: none
+      .modules-box
+        display: block
+
+      // fix display for boxes
+      #modules-mount-point,
+      .modules-box,
+      .modules-box form,
+      .search-box
+        display: inline-block
+        float: left
+
+      form
+        margin-left: 1em
+
+.modules-list
+  position: absolute
+  list-style: none
+  top: 4em
+  left: 11.75em
+  width: $search-box-width
+  padding: 0
+  margin: .5em 0 0 0
+  height: 32px
+  +single-box-shadow(0px,1px,2px,1px,rgba(0,0,0,.16))
+
+  li
+    +clearfix
+    $height: 2rem
+    height: $height
+    line-height: $height
+    margin-bottom: 1px
+    cursor: pointer
+
+    &:hover
+      background-color: scale-lightness(white, -5%)
+
+    &.empty-item
+      padding-left: .5em
+      cursor: default
+
+      &:hover
+        background-color: inherit
+
+  .module-code,
+  .module-title
+    display: inline-block
+    float: left
+
+  $module-code-width: 5em
+
+  .module-code
+    color: white
+    +text(center)
+    width: $module-code-width
+    font-size: .75rem
+    width: 6em
+    font-weight: 600
+    $height: 1.5rem
+    height: $height
+    line-height: $height
+    margin: .25rem
+
+  .module-title
+    max-width:  $search-box-width - $module-code-width
+
 .splash
   +text(center)
 
 @media #{$medium-up}
+  .top-bar
+    .modules-list,
+    .search-box input[type="text"]
+      min-width: $search-box-width
+
   .splash
     +text(left)

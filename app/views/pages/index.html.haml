@@ -1,5 +1,5 @@
 -# include view specific js
--# @view_js = ['pages/index']
+- @view_js = ['pages/index']
 %header.container
   .top-bar
     = link_to root_path, class: 'logo' do
@@ -7,6 +7,7 @@
         = image_tag 'shared/logo.svg', alt: 'Elvis', class: 'responsive'
       .logo-text
         %h1 Elvis
+    #modules-mount-point
     %nav
       = link_to 'Features', '#'
       = link_to 'Sign In', '#'
@@ -18,6 +19,6 @@
     %br/
     has never been this easy.
   = link_to '#' do
-    %button.action
+    %button.action#start-now
       Start Now
 

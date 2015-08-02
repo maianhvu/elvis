@@ -227,6 +227,13 @@ $(function() {
     });
   }
 
+  /**
+   * Return the parsed data for the model
+   */
+  api.dataForModule = function(moduleCode) {
+    return JSON.parse(sessionStorage.getItem(moduleCode));
+  }
+
   // export API to global scope
   window['API'] = api;
 });

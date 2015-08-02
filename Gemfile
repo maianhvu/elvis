@@ -30,6 +30,8 @@ gem 'haml-rails'
 gem 'compass-rails'
 # Use ReactJS
 gem 'react-rails', '~> 1.0'
+# Use FontAwesome for icons
+gem 'font-awesome-sass'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
