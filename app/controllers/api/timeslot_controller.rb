@@ -1,17 +1,9 @@
 module API
   class TimeslotController < ApplicationController
     def index
-      ts = Timeslot.all
+      ts = current_user.timeslots
 
       repond_to do |format|
-        format.json
-      end
-    end
-
-    def create
-      t = Timeslot.new(timeslot_params)
-
-      respond_to do |format|
         format.json
       end
     end
@@ -25,7 +17,22 @@ module API
     end
 
     def update
-      t = Timeslot.find(params[:id])
+      @timeslots = current_user.timeslots
+      current_no = @timeslots.count
+      update_no = timeslot_params.count
+
+      if (current_no < update_no)
+        (0..current_no - 1).each do |i|
+          @timeslots[i].update_attributes(timeslot_params[i])
+          @timeslots[i].save
+        end
+      else
+        (current_no..update_no - 1).each do |i|
+          @timeslots[i] = current_user.timeslots.build(timeslots_params[i])
+          @timeslots[i].save
+        end
+      end
+
 
       respond_to do |format|
         format.json
@@ -34,8 +41,7 @@ module API
 
     private
       def timeslot_params
-        params.require(:timeslot).permit(:lesson_type, :class_no, :weektext, :day, :start, :end, :venue)
-
+        params.require(:timeslots)
       end
 
   end
