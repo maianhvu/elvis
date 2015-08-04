@@ -144,7 +144,7 @@ header
   margin: auto
   +clearfix
   +text(center)
-  //overflow: visible
+  overflow: visible
 
   .logo
     .logo-img,
@@ -202,6 +202,7 @@ header
             background-color: $primary-color
 
     .modules-box
+      position: relative
       display: none
 
       .search-box,
@@ -225,11 +226,14 @@ header
       form
         margin-left: 1em
 
+%highlighted-list-item
+  background-color: scale-lightness(white, -5%)
+
 .modules-list
   position: absolute
   list-style: none
-  top: 4em
-  left: 11.75em
+  top: 2em
+  left: 1em
   width: $search-box-width
   padding: 0
   margin: .5em 0 0 0
@@ -244,8 +248,8 @@ header
     margin-bottom: 1px
     cursor: pointer
 
-    &:hover
-      background-color: scale-lightness(white, -5%)
+    &.active
+      @extend %highlighted-list-item
 
     &.empty-item
       padding-left: .5em
@@ -287,3 +291,87 @@ header
 
   .splash
     +text(left)
+//-------------------------------------------------------------------------------------------------
+// MAIN SECTION
+//-------------------------------------------------------------------------------------------------
+.main-section
+  +clearfix
+
+.timetable-display,
+.modules-display
+  display: inline-block
+  float: right
+/* Timetable */
+.timetable-display
+  width: 100%
+/* Modules Display */
+.modules-display
+  width: 100%
+
+.modules-display-list
+  list-style: none
+  margin: 0
+  padding: 0
+
+  $list-item-height: 3em
+
+  li
+    +clearfix
+    height: $list-item-height
+    margin-bottom: 2px
+
+  .module-ordinal,
+  .module-remove
+    width: 1em
+
+  .module-ordinal,
+  .module-info
+    float: left
+
+  .module-remove
+    float: right
+
+  .module-ordinal
+    line-height: $list-item-height
+    +text(center)
+    color: white
+
+  .module-info
+    +display-flex
+    +flex-direction(column)
+    +justify-content(center)
+    margin: 0 .5em
+
+  .module-code
+    font-weight: 600
+
+  .module-remove
+    line-height: $list-item-height
+
+  .remove-button
+    background: rgba(#333,0.25)
+    border: none
+    padding: 0
+    margin: 0
+    +border-radius(50%)
+    $size: 1em
+    width: $size
+    height: $size
+    line-height: $size
+    color: white
+
+    &:hover
+      background: rgba(#333,1)
+
+@media #{$medium-up}
+  .timetable-display
+    width: 60%
+  .modules-display
+    width: 40%
+
+@media #{$medium-up}
+  .timetable-display
+    width: 70%
+  .modules-display
+    width: 30%
+

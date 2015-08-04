@@ -231,7 +231,9 @@ $(function() {
    * Return the parsed data for the model
    */
   api.dataForModule = function(moduleCode) {
-    return JSON.parse(sessionStorage.getItem(moduleCode));
+    var data = JSON.parse(sessionStorage.getItem(moduleCode));
+    data['code'] = moduleCode;
+    return data;
   }
 
   // export API to global scope
