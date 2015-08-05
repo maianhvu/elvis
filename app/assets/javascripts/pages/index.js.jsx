@@ -2,6 +2,14 @@ $(function() {
 
   var inputUpdateTimer = null;
 
+  var parseTime = function(time) {
+    var hour = Math.floor(time).toString();
+    if (hour.length === 1) hour = "0" + hour;
+    var minutes = ((time % 1) * 60).toString();
+    if (minutes.length === 1) minutes = "0" + minutes;
+    return hour + ":" + minutes;
+  }
+
   //-------------------------------------------------------------------------------------------------
   // REACT JS COMPONENTS
   //-------------------------------------------------------------------------------------------------
@@ -11,7 +19,7 @@ $(function() {
     getDefaultProps: function() { return {
       addModuleText: "Add",
       importModulesText: "Import",
-      urlRegExp: /^http:\/\/modsn.us\/.+$/i,
+      urlRegExp: /^(?:http(?:s)?:\/\/)?(?:modsn.us|nusmods\.com\/timetable)\/.+$/i,
     }; },
     // set initial states
     getInitialState: function() { return {
@@ -35,6 +43,7 @@ $(function() {
           commitLabel: this.props.importModulesText,
           adding: false,
         });
+        this.hideModulesList();
       } else if (!this.props.urlRegExp.test(input)) {
         // if the regexp fails, which means user adding url manually
         // check if using correct label
@@ -43,6 +52,7 @@ $(function() {
             commitLabel: this.props.addModuleText,
             adding: true,
           });
+          this.showModulesList();
         }
         // then, in any case, filter input
         this.props.onInputChange(input);
@@ -129,7 +139,7 @@ $(function() {
       if (this.props.data.length !== 0) {
         height = this.props.data.length;
         moduleNodes = this.props.data.map(function(module, index) {
-          var colour = "#" + moduleColourHash(module.code);
+          var colour = "#" + colorForModule(module.code);
           var classes = activeId === index ? "active" : "";
           return (
             <li key={index} onClick={this.props.commitModule}
@@ -222,6 +232,7 @@ $(function() {
     addActiveModule: function() {
       Modules.add(this.state.filteredData[this.state.activeItemId].code);
       this.props.display.updateModulesData();
+      this.props.timetable.refreshTimeslots();
     },
     // initial state
     getInitialState: function() { return {
@@ -261,6 +272,110 @@ $(function() {
   //-----------------------------------------------------------------------------------------------------------
   // MODULES DISPLAY REACT COMPONENT
   //-----------------------------------------------------------------------------------------------------------
+  var TimeslotChoice = React.createClass({
+    handleTimeslotClick: function() {
+      this.props.onTimeslotClick(this.props.id);
+    },
+
+    render: function() {
+      return (<li onClick={this.handleTimeslotClick}>{this.props.value}</li>);
+    }
+  });
+
+  var ModuleGroup = React.createClass({
+    getInitialState: function() {
+      var chosenSlotId = 0;
+      var slots = Object.keys(this.props.group);
+      if (this.props.group.length !== 0) {
+        var chosenSlots = Modules.timeslotsForModule(this.props.moduleCode);
+        var firstSlot = slots[0];
+        var chosenSlot = chosenSlots.filter(function(slot) { return slot.substr(0,3) === firstSlot.substr(0,3); })[0];
+        if (chosenSlot) {
+          chosenSlotId = slots.indexOf(chosenSlot);
+          if (chosenSlotId === -1) chosenSlotId = 0;
+        }
+      }
+
+      return {
+        chosenSlotId: chosenSlotId,
+        listShown: false,
+      };
+    },
+
+    showList: function() {
+      this.setState({ listShown: true });
+    },
+
+    hideList: function() {
+      this.setState({ listShown: false });
+    },
+
+    updateChosenSlot: function(index) {
+      var id = parseInt(index);
+      if (id !== this.state.chosenSlotId) {
+        this.setState({ chosenSlotId: parseInt(index) });
+      }
+      this.setState({ listShown: false });
+    },
+
+    componentDidUpdate: function(prevProps, prevState) {
+      if (prevState.chosenSlotId !== this.state.chosenSlotId) {
+        var slots = Object.keys(this.props.group);
+        var prevSlot = slots[prevState.chosenSlotId];
+        var newSlot = slots[this.state.chosenSlotId];
+        Modules.replaceSlot(this.props.moduleCode, prevSlot, newSlot);
+        this.props.handleSlotChange();
+      }
+    },
+
+    render: function() {
+      var slots = Object.keys(this.props.group);
+      var choices = slots.map(function(choice, index) {
+        return (
+          <TimeslotChoice key={index} id={index}
+            value={choice} onTimeslotClick={this.updateChosenSlot}
+          />
+        );
+      }.bind(this));
+
+      var classes = classNames({
+        "slots-group": true,
+        "active": this.state.listShown,
+      });
+
+      return (
+        <div className={classes} onMouseLeave={this.hideList}>
+          <div className="slots-label" onMouseEnter={this.showList}>{slots[this.state.chosenSlotId]}</div>
+          <ul className="slots-list">
+            {choices}
+          </ul>
+        </div>
+      );
+    }
+  });
+
+  var ModuleSlots = React.createClass({
+    render: function() {
+
+      var groupNodes = Object.keys(this.props.groups).map(function(group, index) {
+        return (
+          <ModuleGroup key={index}
+            moduleCode={this.props.moduleCode}
+            handleSlotChange={this.props.handleSlotChange}
+            group={this.props.groups[group]}
+          />
+        );
+      }.bind(this));
+
+      return (
+        <div className="module-slots">
+          {groupNodes}
+        </div>
+      );
+    }
+  });
+
+
   var ModulesDisplayItem = React.createClass({
 
     handleRemoveClick: function() {
@@ -270,12 +385,13 @@ $(function() {
     render: function() { return (
       <li>
         <div className="module-ordinal"
-          style={{ backgroundColor: '#' + moduleColourHash(this.props.module.code) }}>
+          style={{ backgroundColor: '#' + colorForModule(this.props.module.code) }}>
           {this.props.index}
         </div>
         <div className="module-info">
           <div className="module-code">{this.props.module.code}</div>
           <div className="module-title">{this.props.module.title}</div>
+          <ModuleSlots handleSlotChange={this.props.handleSlotChange} moduleCode={this.props.module.code} groups={this.props.module.timeslots} />
         </div>
         <div className="module-remove">
           <button className="remove-button" onClick={this.handleRemoveClick}>&times;</button>
@@ -292,11 +408,13 @@ $(function() {
           return API.dataForModule(module);
         })
       });
+      this.props.timetable.refreshTimeslots();
     },
 
     removeModule: function(moduleCode) {
       Modules.remove(moduleCode);
       this.updateModulesData();
+      this.props.timetable.refreshTimeslots();
     },
 
     getInitialState: function() { return {
@@ -308,10 +426,15 @@ $(function() {
       var moduleNodes;
       if (this.state.modules.length > 0) {
         moduleNodes = this.state.modules.map(function(module, index) {
-          return <ModulesDisplayItem key={index} module={module} index={index} handleRemoveClick={this.removeModule} />;
+          return (
+            <ModulesDisplayItem key={index} module={module}
+              index={index+1} handleRemoveClick={this.removeModule}
+              handleSlotChange={this.props.timetable.refreshTimeslots}
+            />
+          );
         }.bind(this));
       } else {
-        moduleNodes = <li>Please add modules using the box on the top left.</li>
+        moduleNodes = <li>Please add modules using the box on the top left.</li>;
       }
       return (
         <ul className="modules-display-list">
@@ -320,35 +443,207 @@ $(function() {
       );
     }
   });
+  //
+  //------------------------------------------------------------------------------------------------------------
+  // TIMETABLE
+  //------------------------------------------------------------------------------------------------------------
+
+  var daysText = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var mthsText = ["January","February","March","April","May","June","July","August","September","October",
+    "November","December"];
+
+  var TimelineMark = React.createClass({
+    handleClick: function() {
+      this.props.onMarkClick(this.props.id);
+    },
+
+    render: function() {
+      var dayText = daysText[this.props.date.getDay()].substr(0,3);
+      var mthText = mthsText[this.props.date.getMonth()].substr(0,3);
+      var classes = classNames({
+        "timeline-mark": true,
+        "active": this.props.active,
+      });
+      var todaySign = "";
+
+      if (this.props.id === 0) {
+        todaySign = (<span className="today-sign">Today,&nbsp;</span>);
+      }
+
+      return (
+        <div className={classes} onClick={this.handleClick}>
+          {/* text*/}
+          <div className="mark-text">
+            {todaySign}{dayText} {this.props.date.getDate()} {mthText}
+          </div>
+          <div className="mark">
+          </div>
+        </div>
+      );
+    }
+  });
+
+  var Timeline = React.createClass({
+    getDefaultProps: function() { return {
+      daysLimit: 7,
+    }; },
+
+    render: function() {
+      var dayNodes = [];
+      var dayMillis = 1000 * 60 * 60 * 24;
+      var now = new Date().getTime();
+      for (var i = 0; i < this.props.daysLimit; i++) {
+        dayNodes.push(
+          <TimelineMark key={i}
+            active={i==this.props.activeMark}
+            id={i}
+            onMarkClick={this.props.onUpdateActiveMark}
+            date={new Date(now + i * dayMillis)} />
+        );
+      }
+      return (
+        <div className={"timeline mark-" + this.props.activeMark.toString()}>
+          {dayNodes}
+        </div>
+      );
+    }
+  });
+
+  /* Timeslots */
+  var AgendaItem = React.createClass({
+    render: function() {
+      return (
+        <li>
+          <div className="agenda-time">
+            {parseTime(this.props.timeslot.start)}<br/>
+            &mdash; {parseTime(this.props.timeslot.end)}
+          </div>
+          <div className="agenda-main" style={{ borderLeftColor: '#' + colorForModule(this.props.timeslot.module) }}>
+            <div className="agenda-title">
+              <span className="agenda-module">{this.props.timeslot.module}</span>
+              &nbsp;
+              <span className="agenda-type">{this.props.timeslot.slotCode}</span>
+            </div>
+            <div className="agenda-details">
+              <div className="agenda-venue">{this.props.timeslot.venue}</div>
+            </div>
+          </div>
+        </li>
+      );
+    }
+  });
+
+  var AgendaDisplay = React.createClass({
+    render: function() {
+      var agendaNodes = this.props.timeslots.map(function(timeslot, index) {
+        return (<AgendaItem key={index} timeslot={timeslot} />);
+      });
+
+      if (agendaNodes.length === 0) {
+        agendaNodes = (<li>Nothing today. Yay! :)</li>);
+      }
+
+      return (
+        <ul className="agenda-list">
+          {agendaNodes}
+        </ul>
+      );
+    }
+  });
+
+  var TimetableDisplay = React.createClass({
+    getDefaultProps: function() { return {
+      today: new Date().getDay(),
+    }; },
+
+    getInitialState: function() { return {
+      activeDay: 0,
+      timeslots: [],
+    }; },
+
+    setActiveDay: function(day) {
+      this.setState({
+        activeDay: parseInt(day),
+      });
+      this.updateTimeslots(this.dayCodeFor(day));
+    },
+
+    updateTimeslots: function(day) {
+      var timeslots = Modules.timeslotsForDay(day);
+      this.setState({
+        timeslots: timeslots,
+      });
+    },
+
+    refreshTimeslots: function() {
+      this.setState({
+        timeslots: Modules.timeslotsForDay(this.dayCodeFor(this.state.activeDay)),
+      });
+    },
+
+    dayCodeFor: function(day) {
+      return (this.props.today + day) % 7;
+    },
+
+    render: function() {
+      return (
+        <div className="timetable-box">
+          <Timeline activeMark={this.state.activeDay} onUpdateActiveMark={this.setActiveDay} />
+          <AgendaDisplay timeslots={this.state.timeslots} />
+        </div>
+      );
+    }
+  });
 
   //------------------------------------------------------------------------------------------------------------
   // INITIALIZATION SCRIPT
   //------------------------------------------------------------------------------------------------------------
   $(document).ready(function() {
+    var animDuration = 250;
+
+    var timetable = React.render(
+      <TimetableDisplay />,
+      document.getElementById('timetable-mount-point')
+    );
+
     // Rendering ModulesDisplay
     var modulesDisplay = React.render(
-      <ModulesDisplay />,
+      <ModulesDisplay timetable={timetable} />,
       document.getElementById('modules-display-mount-point')
     );
 
     // Rendering ModulesBox
     React.render(
-      <ModulesBox display={modulesDisplay} />,
+      <ModulesBox display={modulesDisplay} timetable={timetable} />,
       document.getElementById('modules-mount-point')
     );
 
-
-    var showModulesSearch = function() {
-      $('.top-bar').addClass('active');
-      $('.splash').slideUp(250);
-    };
+    var setUIVisibility = function(uiVisible) {
+      var elToShow, elToHide;
+      if (uiVisible) {
+        elToShow = $('.main-section');
+        elToHide = $('.splash-section');
+      } else {
+        elToShow = $('.splash-section');
+        elToHide = $('.main-section');
+      }
+      elToShow.css({ display: 'block' });
+      elToShow.addClass('shown');
+      elToHide.removeClass('shown');
+      if (uiVisible) {
+        $('.top-bar').addClass('active');
+      } else {
+        $('.top-bar').removeClass('active');
+      }
+      window.setTimeout(function() {
+        elToHide.css({ display: 'none' });
+      }, animDuration);
+    }
 
     // Set onClick action for Action button
-    $('#start-now').click(showModulesSearch);
+    $('#start-now').click(function() { setUIVisibility(true); });
 
     // If modules data present, show the modules search immediately
-    if (Modules.dataPresent()) {
-      showModulesSearch();
-    }
+    setUIVisibility(Modules.dataPresent());
   });
 });

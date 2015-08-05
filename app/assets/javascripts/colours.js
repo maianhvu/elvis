@@ -311,19 +311,8 @@ $(function() {
     if (index >= mults.length) index = index % mults.length;
     return mults[index];
   }
-  var moduleHash = function(moduleCode) {
 
-    if (!match) return "000000";
-
-    var hex = "";
-    for (var i = 0; i < 3; i++) {
-      var code = (colorSum >> (8*i) & 0xFF).toString(16);
-      if (code.length == 1) code = "0" + code;
-      hex += code;
-    }
-    return hex;
-  }
-  window['moduleColourHash'] = function(moduleCode) {
+  window['hexForModule'] = function(moduleCode) {
     if (moduleHashes[moduleCode]) return moduleHashes[moduleCode];
     var match = moduleCode.match(/^([A-Z]+)(\d).+$/i);
     if (!match) return undefined;
@@ -331,8 +320,18 @@ $(function() {
     for (var i = 0; i < match[1].length; i++) {
       colorHash *= primeMultiplier(i-1) + match[1].charCodeAt(i) * primeMultiplier(i);
     }
+    return colourNames[colorHash % colourNames.length];
+  }
+
+  window['colorForModule'] = function(moduleCode) {
+    var match = moduleCode.match(/^([A-Z]+)(\d).+$/i);
+    if (!match) return undefined;
     var shade = 300;
     shade += parseInt(match[2]) * 100;
-    return materialColour(colourNames[colorHash % colourNames.length], shade);
+    return materialColour(hexForModule(moduleCode), shade);
+  }
+
+  window['fadeColorForModule'] = function(moduleCode) {
+    return materialColour(hexForModule(moduleCode), 100);
   }
 });

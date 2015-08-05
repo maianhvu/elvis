@@ -13,7 +13,7 @@
       = link_to 'Sign In', '#'
       = link_to 'Register', '#', class: 'action'
 
-%section.splash.container
+%section.splash-section.container.absolute
   %h2
     Planning for your NUS modules
     %br/
@@ -22,8 +22,8 @@
     %button.action#start-now
       Start Now
 
-%section.main-section.container
-  .timetable-display
+%section.main-section.container.absolute
   .modules-display
     %h2 Selected Modules
     #modules-display-mount-point
+  .timetable-display#timetable-mount-point
