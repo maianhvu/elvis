@@ -125,6 +125,11 @@ input[type="password"]
   padding-left: $container-hpadding
   padding-right: $container-hpadding
 
+  &.absolute
+    position: absolute
+    left: 50%
+    +transform(translateX(-50%))
+
 @media #{$large-up}
   .container
     padding-left: 0
@@ -231,6 +236,7 @@ header
 
 .modules-list
   position: absolute
+  background-color: white
   list-style: none
   top: 2em
   left: 1em
@@ -280,7 +286,19 @@ header
   .module-title
     max-width:  $search-box-width - $module-code-width
 
-.splash
+//-------------------------------------------------------------------------------------------------
+// CONTENT SECTIONS
+//-------------------------------------------------------------------------------------------------
+.splash-section,
+.main-section
+  opacity: 0
+  display: none
+  +transition(opacity 0.25s ease-out 0s)
+
+  &.shown
+    opacity: 1
+
+.splash-section
   +text(center)
 
 @media #{$medium-up}
@@ -289,13 +307,14 @@ header
     .search-box input[type="text"]
       min-width: $search-box-width
 
-  .splash
+  .splash-section
     +text(left)
 //-------------------------------------------------------------------------------------------------
 // MAIN SECTION
 //-------------------------------------------------------------------------------------------------
 .main-section
   +clearfix
+  z-index: -1
 
 .timetable-display,
 .modules-display
@@ -313,12 +332,12 @@ header
   margin: 0
   padding: 0
 
-  $list-item-height: 3em
+  $list-item-height: 4.5em
 
   li
     +clearfix
     height: $list-item-height
-    margin-bottom: 2px
+    margin-bottom: .25em
 
   .module-ordinal,
   .module-remove
@@ -363,15 +382,215 @@ header
     &:hover
       background: rgba(#333,1)
 
-@media #{$medium-up}
+@media #{$large-up}
   .timetable-display
     width: 60%
   .modules-display
     width: 40%
+//-------------------------------------------------------------------------------------------------
+// TIMETABLE
+//-------------------------------------------------------------------------------------------------
+.timetable-box
+  +clearfix
 
-@media #{$medium-up}
-  .timetable-display
-    width: 70%
-  .modules-display
-    width: 30%
+.timeline,
+.agenda-display
+  padding: 0 .5em
 
+$timeline-separator-color: #aaa
+$timeline-width: 11em
+
+.timeline
+  width: $timeline-width
+  float: left
+  position: relative
+  border-right: 1px solid $timeline-separator-color
+//-------------------------------------------------------------------------------------------------
+// TIMELINE
+//-------------------------------------------------------------------------------------------------
+.timeline::before
+  content: ''
+  display: block
+  position: absolute
+  background-color: #f3f3f3
+  width: .25em
+  height: 100%
+  top: 0
+  right: 1.4em
+  z-index: -1
+
+.timeline::after
+  content: ''
+  display: block
+  $size: .5em
+  width: $size
+  height: $size
+  +transform(rotate(-45deg))
+  background-color: white
+  $border: 1px solid $timeline-separator-color
+  border-top: $border
+  border-left: $border
+  position: absolute
+  right: -0.3125rem
+  +transition(top 0.5s ease-out 0s)
+
+$timeline-marks-last-index: 6
+$timeline-mark-height: 2em
+$timeline-mark-margin: 3em
+$timeline-mark-distance: $timeline-mark-height + $timeline-mark-margin
+
+@for $i from 0 through $timeline-marks-last-index
+  .timeline.mark-#{$i}::after
+    top: 0.75em + $timeline-mark-distance * $i
+
+.timeline-mark
+  +clearfix
+  $height: $timeline-mark-height
+  height: $height
+  line-height: $height
+  margin-bottom: $timeline-mark-margin
+  cursor: pointer
+
+  .mark-text,
+  .mark
+    display: inline-block
+
+  .mark-text
+    float: left
+    width: 10em
+    background-color: transparent
+    color: #ccc
+    font-size: .75rem
+    +transition(opacity 0.25s ease-out 0s)
+    +border-radius(.25em)
+    +text(right)
+
+    .today-sign
+      color: #000
+      font-weight: 600
+
+  .mark
+    float: right
+    $size: 1em
+    height: $size
+    width: $size
+    margin: .5em
+    +border-radius(50%)
+    background-color: $primary-color
+    border: 2px solid rgba(white,0.8)
+    +transition(all 0.25s ease-out 0s)
+
+  &.active .mark
+    background-color: $secondary-color
+    +transform(scale(1.25))
+
+  &:hover
+    .mark
+      border-color: rgba(white, 1)
+      +transform(scale(1.5))
+//-------------------------------------------------------------------------------------------------
+// TIMESLOTS/AGENDA
+//-------------------------------------------------------------------------------------------------
+.agenda-list
+  width: 100%
+  list-style: none
+  margin: 0 0 0 $timeline-width
+  padding: 0
+
+  li
+    margin-bottom: .25em
+    +clearfix
+
+$agenda-time-width: 4rem
+
+.agenda-time,
+  float: left
+  font-size: .75rem
+  width: $agenda-time-width
+  padding-right: .5rem
+  color: $timeline-separator-color
+  padding-top: 0.625rem
+  +text(right)
+
+.agenda-main
+  margin-left: $agenda-time-width
+  padding: .25em 0 .25em .5em
+  border-left: 3px solid transparent
+  cursor: pointer
+
+.agenda-module
+  font-weight: 600
+
+.agenda-type
+  color: #888
+  font-size: .75rem
+  font-weight: 300
+
+.module-slots
+  +clearfix
+
+$slots-group-width: 5rem
+
+.slots-group
+  display: inline-block
+  float: left
+  margin-right: .25em
+  cursor: pointer
+  width: $slots-group-width
+
+  &.active
+    .slots-label
+      border-color: $primary-color
+      color: $primary-color
+
+      &::after
+        color: $primary-color
+
+    .slots-list
+      display: block
+      opacity: 1
+
+.slots-label
+  font-size: .75rem
+  +border-radius(.25em)
+  padding: 0.2em 1.5em 0.2em 0.5em
+  $outline-color: #ccc
+  border: 1px solid $outline-color
+  position: relative
+  +transition(all 0.25s ease-out 0s)
+
+  &::after
+    content: '▼'
+    display: block
+    position: absolute
+    $margin: .25rem
+    top: $margin
+    right: $margin
+    font-size: .625rem
+    color: $outline-color
+    +transition(color 0.25s ease-out 0s)
+
+.slots-list
+  list-style: none
+  margin: 0
+  padding: .1rem 0 0 0
+  border: 1px solid #ccc
+  border-radius: .25em
+
+  background-color: white
+
+  position: absolute
+  z-index: 1
+  display: none
+  opacity: 0
+  +transition(all 0.25s ease-out 0s)
+
+  li
+    $height: 1.5em
+    height: $height
+    line-height: $height
+    width: $slots-group-width
+    padding-left: .5em
+    font-size: .75rem
+    &:hover
+      background-color: #eee

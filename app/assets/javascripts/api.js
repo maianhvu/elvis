@@ -236,6 +236,13 @@ $(function() {
     return data;
   }
 
+  /**
+   * Timeslots for module
+   */
+  api.timeslotsForModule = function(moduleCode) {
+    return JSON.parse(sessionStorage.getItem(moduleCode)).timeslots;
+  }
+
   // export API to global scope
   window['API'] = api;
 });
