@@ -464,17 +464,18 @@ $(function() {
         "timeline-mark": true,
         "active": this.props.active,
       });
-      var todaySign = "";
+      var daySign = "";
 
-      if (this.props.id === 0) {
-        todaySign = (<span className="today-sign">Today,&nbsp;</span>);
+      if (this.props.id <= 1) {
+        var days = ["Today", "Tomorrow"];
+        daySign = (<span className="today-sign">{days[this.props.id]},&nbsp;</span>);
       }
 
       return (
         <div className={classes} onClick={this.handleClick}>
           {/* text*/}
           <div className="mark-text">
-            {todaySign}{dayText} {this.props.date.getDate()} {mthText}
+            {daySign}{dayText} {this.props.date.getDate()} {mthText}
           </div>
           <div className="mark">
           </div>
@@ -512,21 +513,21 @@ $(function() {
   /* Timeslots */
   var AgendaItem = React.createClass({
     render: function() {
+      var detailsStyle = {
+        borderLeftColor: '#' + colorForModule(this.props.timeslot.module),
+        backgroundColor: '#' + fadeColorForModule(this.props.timeslot.module),
+      };
+
       return (
         <li>
           <div className="agenda-time">
             {parseTime(this.props.timeslot.start)}<br/>
             &mdash; {parseTime(this.props.timeslot.end)}
           </div>
-          <div className="agenda-main" style={{ borderLeftColor: '#' + colorForModule(this.props.timeslot.module) }}>
-            <div className="agenda-title">
-              <span className="agenda-module">{this.props.timeslot.module}</span>
-              &nbsp;
-              <span className="agenda-type">{this.props.timeslot.slotCode}</span>
-            </div>
-            <div className="agenda-details">
-              <div className="agenda-venue">{this.props.timeslot.venue}</div>
-            </div>
+          <div className="agenda-details" style={detailsStyle}>
+            <div className="agenda-module">{this.props.timeslot.module}</div>
+            <div className="agenda-type">{this.props.timeslot.lessonType}</div>
+            <div className="agenda-venue">{this.props.timeslot.venue}</div>
           </div>
         </li>
       );
@@ -540,13 +541,18 @@ $(function() {
       });
 
       if (agendaNodes.length === 0) {
-        agendaNodes = (<li>Nothing today. Yay! :)</li>);
+        agendaNodes = (<li className="empty-item">Nothing today. Yay! :)</li>);
       }
 
       return (
-        <ul className="agenda-list">
-          {agendaNodes}
-        </ul>
+        <div className="agenda-display">
+          <div className="agenda-title">
+            {this.props.title}
+          </div>
+          <ul className="agenda-list">
+            {agendaNodes}
+          </ul>
+        </div>
       );
     }
   });
@@ -558,7 +564,8 @@ $(function() {
 
     getInitialState: function() { return {
       activeDay: 0,
-      timeslots: [],
+      schoolTimeslots: [],
+      upcomingTimeslots: [],
     }; },
 
     setActiveDay: function(day) {
@@ -569,16 +576,36 @@ $(function() {
     },
 
     updateTimeslots: function(day) {
-      var timeslots = Modules.timeslotsForDay(day);
+      var sts = Modules.timeslotsForDay(day);
+      var uts = this.calculateUpcomingTimeslots(day);
       this.setState({
-        timeslots: timeslots,
+        schoolTimeslots: sts,
+        upcomingTimeslots: uts,
       });
     },
 
     refreshTimeslots: function() {
       this.setState({
-        timeslots: Modules.timeslotsForDay(this.dayCodeFor(this.state.activeDay)),
+        schoolTimeslots: Modules.timeslotsForDay(this.dayCodeFor(this.state.activeDay)),
+        upcomingTimeslots: this.calculateUpcomingTimeslots(),
       });
+    },
+
+    calculateUpcomingTimeslots: function(day) {
+      day = day || this.dayCodeFor(this.state.activeDay);
+      var viewingToday = day === new Date().getDay();
+      var slots = Modules.timeslotsForDay((day + 1) % 7);
+      Array.prototype.push.apply(slots, Modules.timeslotsForDay((day + 2) % 7));
+      slots = slots.filter(function(slot) { return slot.lessonType === "Tutorial" }).map(function(slot) {
+        slot.lessonType = "Prepare for Tutorial";
+        var daysDiff = ((slot.day + 7) - day) % 7;
+        var dayString = daysDiff === 1 ?
+          (viewingToday ? "tomorrow" : "the next day") :
+          ("in " + daysDiff.toString() + " days");
+        slot.venue = "Coming " + dayString;
+        return slot;
+      }.bind(this));
+      return slots;
     },
 
     dayCodeFor: function(day) {
@@ -586,10 +613,19 @@ $(function() {
     },
 
     render: function() {
+      var agendaTitle;
+      switch (this.state.activeDay) {
+        case 0: agendaTitle = "Today"; break;
+        case 1: agendaTitle = "Tomorrow"; break;
+        default:
+          agendaTitle = this.state.activeDay.toString() + " days from now";
+      }
+
       return (
         <div className="timetable-box">
           <Timeline activeMark={this.state.activeDay} onUpdateActiveMark={this.setActiveDay} />
-          <AgendaDisplay timeslots={this.state.timeslots} />
+          <AgendaDisplay title={agendaTitle + " in School"} timeslots={this.state.schoolTimeslots} />
+          <AgendaDisplay title={agendaTitle + " at Home"} timeslots={this.state.upcomingTimeslots} />
         </div>
       );
     }

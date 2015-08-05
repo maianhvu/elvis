@@ -98,6 +98,7 @@ $(function() {
             if (item.day === day) {
               item.module = module;
               item.slotCode = slotCode;
+              item.lessonType = lessonType;
               timeslots.push(item);
             }
           });

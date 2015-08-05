@@ -398,7 +398,7 @@ header
   padding: 0 .5em
 
 $timeline-separator-color: #aaa
-$timeline-width: 11em
+$timeline-width: 11.75em
 
 .timeline
   width: $timeline-width
@@ -457,7 +457,7 @@ $timeline-mark-distance: $timeline-mark-height + $timeline-mark-margin
 
   .mark-text
     float: left
-    width: 10em
+    width: 11em
     background-color: transparent
     color: #ccc
     font-size: .75rem
@@ -491,15 +491,29 @@ $timeline-mark-distance: $timeline-mark-height + $timeline-mark-margin
 //-------------------------------------------------------------------------------------------------
 // TIMESLOTS/AGENDA
 //-------------------------------------------------------------------------------------------------
+.agenda-display
+  margin-left: $timeline-width
+  margin-bottom: 1.5em
+
+.agenda-title
+  font-weight: 600
+  font-size: .875rem
+  margin-left: 0.5rem
+  margin-bottom: .5rem
+
 .agenda-list
-  width: 100%
   list-style: none
-  margin: 0 0 0 $timeline-width
+  margin: 0
   padding: 0
 
   li
     margin-bottom: .25em
     +clearfix
+
+    &.empty-item
+      padding-left: 1rem
+      line-height: 2rem
+      font-weight: 300
 
 $agenda-time-width: 4rem
 
@@ -509,10 +523,10 @@ $agenda-time-width: 4rem
   width: $agenda-time-width
   padding-right: .5rem
   color: $timeline-separator-color
-  padding-top: 0.625rem
+  padding-top: 1.25rem
   +text(right)
 
-.agenda-main
+.agenda-details
   margin-left: $agenda-time-width
   padding: .25em 0 .25em .5em
   border-left: 3px solid transparent
@@ -521,9 +535,9 @@ $agenda-time-width: 4rem
 .agenda-module
   font-weight: 600
 
-.agenda-type
+.agenda-venue
   color: #888
-  font-size: .75rem
+  font-size: .8rem
   font-weight: 300
 
 .module-slots

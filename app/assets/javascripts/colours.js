@@ -332,6 +332,6 @@ $(function() {
   }
 
   window['fadeColorForModule'] = function(moduleCode) {
-    return materialColour(hexForModule(moduleCode), 100);
+    return materialColour(hexForModule(moduleCode), 50);
   }
 });
