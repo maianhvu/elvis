@@ -1,5 +1,5 @@
 $(function() {
-
+  var animDuration = 250;
   var inputUpdateTimer = null;
 
   var parseTime = function(time) {
@@ -10,6 +10,15 @@ $(function() {
     return hour + ":" + minutes;
   }
 
+  var showLoading = function() {
+    $('.loading-box').css({ display: 'block'}).animate({ opacity: 1 }, animDuration);
+  }
+
+  var hideLoading = function() {
+    $('.loading-box').animate({ opacity: 0 }, animDuration, function() {
+      $('.loading-box').css({ display: 'none' });
+    });
+  }
   //-------------------------------------------------------------------------------------------------
   // REACT JS COMPONENTS
   //-------------------------------------------------------------------------------------------------
@@ -77,7 +86,27 @@ $(function() {
     // handle submit
     handleSubmit: function(e) {
       e.preventDefault();
-      this.props.commitModule();
+      var value;
+      if (this.props.urlRegExp.test(value = React.findDOMNode(this.refs.module).value.trim())) {
+        if (value.indexOf("nusmods.com") !== -1) { // Easy URL
+          var regExp = /^([A-Z0-9]+)\[([A-Z]+)\]=(.+)$/;
+          var data = value.substr(value.indexOf('?') + 1).split('&').map(function(datum) {
+            var match = datum.match(regExp);
+            console.log(datum);
+            console.log(match);
+            if (!match) return null;
+            return {
+              module: match[1],
+              slotCode: match[2] + "[" + match[3] + "]",
+            }
+          }).compact();
+          this.props.importModules(data);
+        } else { // Hard URL
+          alert("Sorry, short URLs aren't available yet! Please copy the long URL on the address bar instead.");
+        }
+      } else {
+        this.props.commitModule();
+      }
     },
     // handle arrow keys movement
     handleKeyInput: function(e) {
@@ -185,6 +214,8 @@ $(function() {
           filteredData: identities.limit(this.props.searchLimit),
           activeItemId: 0,
         });
+
+        hideLoading();
       }.bind(this));
     },
     // handle module input
@@ -234,6 +265,16 @@ $(function() {
       this.props.display.updateModulesData();
       this.props.timetable.refreshTimeslots();
     },
+    // using for importing from NUSMods URL
+    importModules: function(data) {
+      Modules.wipeData();
+      data.forEach(function(datum) {
+        Modules.addSlotToModule(datum.slotCode, datum.module);
+        console.log("Adding " + datum.slotCode + " to " + datum.module);
+      });
+      this.props.display.updateModulesData();
+      this.props.timetable.refreshTimeslots();
+    },
     // initial state
     getInitialState: function() { return {
       loading: true,
@@ -257,6 +298,7 @@ $(function() {
             setModulesListVisibility={this.setModulesListVisibility}
             setActiveModule={this.setActiveModule}
             commitModule={this.addActiveModule}
+            importModules={this.importModules}
           />
           <ModulesList data={this.state.filteredData}
             visibility={this.state.modulesListVisible}
@@ -518,11 +560,17 @@ $(function() {
         backgroundColor: '#' + fadeColorForModule(this.props.timeslot.module),
       };
 
+      var upperTimeString = this.props.timeslot.start;
+      var lowerTimeString = this.props.timeslot.end;
+
+      if (typeof upperTimeString === "number") upperTimeString = parseTime(upperTimeString);
+      if (typeof lowerTimeString === "number") lowerTimeString = parseTime(lowerTimeString);
+
       return (
         <li>
           <div className="agenda-time">
-            {parseTime(this.props.timeslot.start)}<br/>
-            &mdash; {parseTime(this.props.timeslot.end)}
+            {upperTimeString}<br/>
+            &mdash; {lowerTimeString}
           </div>
           <div className="agenda-details" style={detailsStyle}>
             <div className="agenda-module">{this.props.timeslot.module}</div>
@@ -603,6 +651,8 @@ $(function() {
           (viewingToday ? "tomorrow" : "the next day") :
           ("in " + daysDiff.toString() + " days");
         slot.venue = "Coming " + dayString;
+        slot.start = "OT";
+        slot.end = "OT";
         return slot;
       }.bind(this));
       return slots;
@@ -652,8 +702,6 @@ $(function() {
   // INITIALIZATION SCRIPT
   //------------------------------------------------------------------------------------------------------------
   $(document).ready(function() {
-    var animDuration = 250;
-
     var timetable = React.render(
       <TimetableDisplay />,
       document.getElementById('timetable-mount-point')
@@ -698,5 +746,7 @@ $(function() {
 
     // If modules data present, show the modules search immediately
     setUIVisibility(Modules.dataPresent());
+
+    showLoading();
   });
 });

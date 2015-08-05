@@ -608,3 +608,37 @@ $slots-group-width: 5rem
     font-size: .75rem
     &:hover
       background-color: #eee
+//-------------------------------------------------------------------------------------------------
+// LOADING SCREEN
+//-------------------------------------------------------------------------------------------------
+.loading-box
+  position: fixed
+  z-index: 9999
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background-color: rgba(#fff, .8)
+  cursor: wait
+  display: none
+  opacity: 0
+
+.loading-items-container
+  position: absolute
+  left: 50%
+  top: 50%
+  color: #555
+  +transform(translate(-50%, -50%))
+  $size: 3rem
+  +text(center)
+
+  .fa-spin
+    font-size: $size
+    margin-bottom: .125rem
+
+  .loading-text
+    width: $size
+    text-transform: uppercase
+    font-weight: 600
+    font-size: 0.675rem
+

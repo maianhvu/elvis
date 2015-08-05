@@ -30,7 +30,7 @@ $(function() {
     return modulesHelper.all().indexOf(moduleCode) != -1;
   }
 
-  modulesHelper.add = function(moduleCode, callback) {
+  modulesHelper.add = function(moduleCode, callback, noDefaultTimeslots) {
     if (!modulesHelper.added(moduleCode)) {
       var modulesList = localStorage.getItem(modulesHelper.keyFor.modulesList);
       // If modulesList does not exist or is empty
@@ -44,12 +44,14 @@ $(function() {
         localStorage.setItem(modulesHelper.keyFor.modulesDataPresent, true);
       }
       // Default to first timeslots
-      var groups = API.timeslotsForModule(moduleCode);
-      var groupKeys = Object.keys(groups);
-      var groupsString = groupKeys.map(function(groupKey) {
-        return Object.keys(groups[groupKey])[0];
-      }).join(',');
-      localStorage.setItem(moduleCode, groupsString);
+      if (!noDefaultTimeslots) {
+        var groups = API.timeslotsForModule(moduleCode);
+        var groupKeys = Object.keys(groups);
+        var groupsString = groupKeys.map(function(groupKey) {
+          return Object.keys(groups[groupKey])[0];
+        }).join(',');
+        localStorage.setItem(moduleCode, groupsString);
+      }
     }
     if (typeof callback === 'function') { callback(); }
   }
@@ -133,7 +135,7 @@ $(function() {
   /**
    * Wipe existing module
    */
-  modulesHelper.wipeModules = function() {
+  modulesHelper.wipeData = function() {
     if (!modulesHelper.dataPresent()) return;
     var modules = modulesHelper.all();
     // delete each modules first
@@ -144,6 +146,29 @@ $(function() {
     localStorage.removeItem(modulesHelper.keyFor.modulesList);
     // delete the data present key
     localStorage.removeItem(modulesHelper.keyFor.modulesDataPresent);
+  }
+
+  /**
+   * Add timeslot to a module
+   */
+  modulesHelper.addSlotToModule = function(slot, module) {
+    // Add the module if it is not in
+    if (!localStorage.getItem(modulesHelper.keyFor.modulesList)) {
+      localStorage.setItem(modulesHelper.keyFor.modulesList, module);
+    } else if (localStorage.getItem(modulesHelper.keyFor.modulesList).indexOf(module) === -1) {
+      localStorage.setItem(modulesHelper.keyFor.modulesList,
+                           localStorage.getItem(modulesHelper.keyFor.modulesList) + "," + module);
+    }
+    // Mark data as present if not
+    if (!localStorage.getItem(modulesHelper.keyFor.modulesDataPresent)) {
+      localStorage.setItem(modulesHelper.keyFor.modulesDataPresent, true);
+    }
+    // Addd the module
+    if (!localStorage.getItem(module)) {
+      localStorage.setItem(module, slot);
+    } else if (localStorage.getItem(module).indexOf(slot) === -1) {
+      localStorage.setItem(module, localStorage.getItem(module) + "," + slot);
+    }
   }
 
   // export to global scope

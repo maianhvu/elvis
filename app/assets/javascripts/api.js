@@ -21,6 +21,15 @@ $(function() {
   Array.prototype.limit = function(count) {
     return this.slice(0, count);
   }
+
+  /**
+   * Extension to delete null and undefined elements from array
+   */
+  Array.prototype.compact = function() {
+    return this.filter(function(el) {
+      return el !== null && el !== undefined;
+    });
+  }
   //------------------------------------------------------------------------------------------------------------
   // HELPER METHODS
   //------------------------------------------------------------------------------------------------------------
