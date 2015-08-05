@@ -621,11 +621,28 @@ $(function() {
           agendaTitle = this.state.activeDay.toString() + " days from now";
       }
 
+      var timetable1 = <AgendaDisplay title={agendaTitle + " in School"} timeslots={this.state.schoolTimeslots} />;
+      var timetable2 = <AgendaDisplay title={agendaTitle + " at Home"} timeslots={this.state.upcomingTimeslots} />;
+
+      if (this.state.schoolTimeslots.length > 0) {
+        var lastSlot = this.state.schoolTimeslots[this.state.schoolTimeslots.length - 1];
+        var now = new Date();
+        var thisTime = now.getHours() + now.getMinutes() / 60;
+        var schoolOver =
+          this.state.activeDay === 0 && // must be today
+          thisTime >= lastSlot.end; // must past last slot
+        if (schoolOver) { // swap the two timetables
+          var temp = timetable1;
+          timetable1 = timetable2;
+          timetable2 = temp;
+        }
+      }
+
       return (
         <div className="timetable-box">
           <Timeline activeMark={this.state.activeDay} onUpdateActiveMark={this.setActiveDay} />
-          <AgendaDisplay title={agendaTitle + " in School"} timeslots={this.state.schoolTimeslots} />
-          <AgendaDisplay title={agendaTitle + " at Home"} timeslots={this.state.upcomingTimeslots} />
+          {timetable1}
+          {timetable2}
         </div>
       );
     }
