@@ -702,51 +702,53 @@ $(function() {
   // INITIALIZATION SCRIPT
   //------------------------------------------------------------------------------------------------------------
   $(document).ready(function() {
-    var timetable = React.render(
-      <TimetableDisplay />,
-      document.getElementById('timetable-mount-point')
-    );
-
-    // Rendering ModulesDisplay
-    var modulesDisplay = React.render(
-      <ModulesDisplay timetable={timetable} />,
-      document.getElementById('modules-display-mount-point')
-    );
-
-    // Rendering ModulesBox
-    React.render(
-      <ModulesBox display={modulesDisplay} timetable={timetable} />,
-      document.getElementById('modules-mount-point')
-    );
-
-    var setUIVisibility = function(uiVisible) {
-      var elToShow, elToHide;
-      if (uiVisible) {
-        elToShow = $('.main-section');
-        elToHide = $('.splash-section');
-      } else {
-        elToShow = $('.splash-section');
-        elToHide = $('.main-section');
-      }
-      elToShow.css({ display: 'block' });
-      elToShow.addClass('shown');
-      elToHide.removeClass('shown');
-      if (uiVisible) {
-        $('.top-bar').addClass('active');
-      } else {
-        $('.top-bar').removeClass('active');
-      }
-      window.setTimeout(function() {
-        elToHide.css({ display: 'none' });
-      }, animDuration);
-    }
-
-    // Set onClick action for Action button
-    $('#start-now').click(function() { setUIVisibility(true); });
-
-    // If modules data present, show the modules search immediately
-    setUIVisibility(Modules.dataPresent());
-
     showLoading();
+
+    API.getData(function() {
+      var timetable = React.render(
+        <TimetableDisplay />,
+        document.getElementById('timetable-mount-point')
+      );
+
+      // Rendering ModulesDisplay
+      var modulesDisplay = React.render(
+        <ModulesDisplay timetable={timetable} />,
+        document.getElementById('modules-display-mount-point')
+      );
+
+      // Rendering ModulesBox
+      React.render(
+        <ModulesBox display={modulesDisplay} timetable={timetable} />,
+        document.getElementById('modules-mount-point')
+      );
+
+      var setUIVisibility = function(uiVisible) {
+        var elToShow, elToHide;
+        if (uiVisible) {
+          elToShow = $('.main-section');
+          elToHide = $('.splash-section');
+        } else {
+          elToShow = $('.splash-section');
+          elToHide = $('.main-section');
+        }
+        elToShow.css({ display: 'block' });
+        elToShow.addClass('shown');
+        elToHide.removeClass('shown');
+        if (uiVisible) {
+          $('.top-bar').addClass('active');
+        } else {
+          $('.top-bar').removeClass('active');
+        }
+        window.setTimeout(function() {
+          elToHide.css({ display: 'none' });
+        }, animDuration);
+      }
+
+      // Set onClick action for Action button
+      $('#start-now').click(function() { setUIVisibility(true); });
+
+      // If modules data present, show the modules search immediately
+      setUIVisibility(Modules.dataPresent());
+    });
   });
 });
