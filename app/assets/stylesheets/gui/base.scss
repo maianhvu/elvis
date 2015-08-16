@@ -1,0 +1,6 @@
+/* Set all box sizings to border-box */
+html,
+body {
+  @include box-sizing(border-box);
+  * { @include box-sizing(inherit); }
+}

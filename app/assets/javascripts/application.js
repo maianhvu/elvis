@@ -13,9 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require localforage.min
 //= require react
 //= require react_ujs
-//= require components
-//= require classnames
-//= require_tree .
-//= stub pages

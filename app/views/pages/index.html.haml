@@ -1,35 +1,6 @@
--# include view specific js
-- @view_js = ['pages/index']
-%header.container
-  .top-bar
-    = link_to root_path, class: 'logo' do
-      .logo-img
-        = image_tag 'shared/logo.svg', alt: 'Elvis', class: 'responsive'
-      .logo-text
-        %h1 Elvis
-    #modules-mount-point
-    %nav
-      = link_to 'Features', '#'
-      = link_to 'Sign In', sign_in_path
-      = link_to 'Register', register_path, class: 'action'
+.top-bar
+  .container
+    #search-box
 
-%section.splash-section.container.absolute
-  %h2
-    Planning for your NUS modules
-    %br/
-    has never been this easy.
-  = link_to '#' do
-    %button.action#start-now
-      Start Now
-
-%section.main-section.container.absolute
-  .modules-display
-    %h2 Selected Modules
-    #modules-display-mount-point
-  .timetable-display#timetable-mount-point
-
-.loading-box
-  .loading-screen
-  .loading-items-container
-    %i.fa.fa-circle-o-notch.fa-spin
-    .loading-text Loading
+- content_for :js do
+  = javascript_include_tag 'pages/index', 'data-turbolinks-track' => true

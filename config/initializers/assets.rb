@@ -8,16 +8,11 @@ Rails.application.config.assets.version = '1.0'
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-# Rails.application.config.assets.precompile += %w( search.js )
-{
-  pages: "index.js",
-}.each_pair do |controller, assets|
-  precompile_list = if assets.is_a? String
-                       [controller.to_s << "/" << assets]
-                     elsif assets.is_a? Array
-                       assets.map { |a| controller.to_s << "/" << a }
-                     else
-                       [controller.to_s]
-                     end
-  Rails.application.config.assets.precompile += precompile_list
+Rails.application.config.assets.precompile += %w( api.js helper.js )
+
+{ pages: [ :index ],
+}.each_pair do |controller, actions|
+  Rails.application.config.assets.precompile += actions.map do |a|
+    "#{controller}/#{a}.js"
+  end
 end
