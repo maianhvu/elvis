@@ -16,3 +16,4 @@
 //= require localforage.min
 //= require react
 //= require react_ujs
+//= require classnames

@@ -47,7 +47,10 @@ $(function() {
 
   /* Declare constants */
   var APIParameters = Object.freeze({
-    url: "http://api.nusmods.com/2015-2016/1/timetable.json",
+    url: Object.freeze({
+      moduleList: "http://api.nusmods.com/2015-2016/1/moduleList.json",
+      timetable: "http://api.nusmods.com/2015-2016/1/timetable.json",
+    }),
     keys: Object.freeze({
       modulesList: "APIModulesList",
       dataPresent: "APIDataPresent",
@@ -64,7 +67,7 @@ $(function() {
     localforage.getItem(APIParameters.keys.dataPresent, function(err, presence) {
       console.log(presence);
       if (!presence) { // Get from remote API
-        $.getJSON(APIParameters.url, function(data) {
+        $.getJSON(APIParameters.url.timetable, function(data) {
           // Process the retrieved objects one by one
           var parsedData = data.map(parseData);
           var count = 0;
@@ -87,6 +90,12 @@ $(function() {
     if (typeof callback !== 'function') return false;
     G.et(code).then(function(err, data) {
       callback(data);
+    });
+  };
+
+  api.prototype.retrieveModulesData = function(callback) {
+    $.getJSON(APIParameters.url.moduleList, function(data) {
+      if (callback && typeof callback === 'function') callback(data);
     });
   };
 

@@ -1,6 +1,14 @@
 .top-bar
   .container
-    #search-box
+    #module-search
+
+%section.top-results
+  .container
+    #module-list
+
+%section.preview
+  .container
+    #module-preview
 
 - content_for :js do
   = javascript_include_tag 'pages/index', 'data-turbolinks-track' => true
