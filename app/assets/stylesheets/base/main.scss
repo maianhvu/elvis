@@ -1,0 +1,49 @@
+html, body {
+  font-family: $font-family-default;
+  font-weight: $font-weight-normal;
+}
+
+.container {
+  width: 100%;
+  padding: 0 $container-small-side-padding;
+  margin: auto;
+  max-width: 1200px;
+
+  &.restrained {
+    max-width: 560px;
+  }
+}
+
+@media #{$medium-up} { .container { padding: 0 $container-medium-side-padding; } }
+@media #{$large-up}  { .container { padding: 0 $container-large-side-padding;  } }
+
+@mixin side-label($title, $line-height) {
+  position: relative;
+  &::before {
+    content: $title;
+    display: block;
+    position: absolute;
+    font-weight: $font-weight-light;
+    color: #333;
+    line-height: $line-height;
+    left: -1 * $rhythm-margin;
+    @include transform(translateX(-100%));
+  }
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,.8);
+
+  @include transition(all 0.25s ease-out 0s);
+
+  @for $i from 1 through 3 {
+    &.screen--layer-#{$i} {
+      z-index: $i;
+    }
+  }
+}

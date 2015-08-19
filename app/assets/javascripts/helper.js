@@ -7,48 +7,6 @@
 $(function() {
 
   //-------------------------------------------------------------------------------------------------
-  // LOCALFORAGE HELPERS
-  //-------------------------------------------------------------------------------------------------
-  var ForageKey = function(key) { this.key = key; };
-
-  var ForageSetKey = function(key) { ForageKey.call(this, key); };
-  var ForageGetKey = function(key) { ForageKey.call(this, key); };
-
-  /* ForageKey object for setting */
-  ForageSetKey.prototype.to = function(value) {
-    return localforage.setItem(this.key, value);
-  };
-
-  /* ForageKey object for getting */
-  ForageGetKey.prototype.then = function(callback) {
-    localforage.getItem(this.key, callback);
-  };
-
-  /* Define helper class */
-  var ForageSetter = function() { };
-
-  /**
-   * Set for chaining
-   */
-  ForageSetter.et = function(key) {
-    return new ForageSetKey(key);
-  };
-
-  var ForageGetter = function() { };
-
-  ForageGetter.et = function(key) {
-    return new ForageGetKey(key);
-  };
-
-  window.printValue = function(err, value) {
-    console.log(value);
-  };
-
-  /* Export to Global scope */
-  window.S = ForageSetter;
-  window.G = ForageGetter;
-
-  //-------------------------------------------------------------------------------------------------
   // OTHER HELPER METHODS
   //-------------------------------------------------------------------------------------------------
   var helper = function() {
@@ -74,6 +32,7 @@ $(function() {
     if (this.timeCache.hasOwnProperty(time)) {
       return this.timeCache[time];
     }
+    if (time.constructor === Number) return time;
     var parsedTime = parseInt(time.substr(0,2)) +
       parseInt(time.substr(2,2)) / 60;
     this.timeCache[time] = parsedTime;

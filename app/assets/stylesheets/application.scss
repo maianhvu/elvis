@@ -1,4 +1,7 @@
-@import "reset";
-@import "variables";
 @import "compass/css3";
+@import "vars";
+@import "font-awesome-sprockets";
+@import "font-awesome";
+@import "generic/**/*";
+@import "base/**/*";
 @import "gui/**/*";

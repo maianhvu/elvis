@@ -1,0 +1,33 @@
+.module-list {
+  margin-top: $rhythm-margin;
+  @include side-label("Top Results", 2.5rem);
+}
+
+.module-list__item,
+.module-list__item--empty {
+  padding: $module-list-item-padding;
+  margin-bottom: $rhythm-inch;
+}
+
+.module-list__item {
+  color: white;
+  background-color: $ocean-blue-2;
+  cursor: pointer;
+  @include transition(background-color 0.25s ease-out 0s);
+
+  &.active {
+    background-color: $ocean-blue-4;
+  }
+}
+
+.module-list__item--empty {
+  border: 1px solid #efefef;
+}
+
+.module-list__code {
+  font-weight: $font-weight-semibold;
+}
+
+.module-list__title {
+  font-weight: $font-weight-light;
+}

@@ -1,0 +1,29 @@
+$magnifying-glass-size: 1.5rem;
+
+.module-search__form{
+  position: relative;
+  margin-top: $rhythm-margin;
+
+  &::before {
+    content: "\f002";
+    display: block;
+    font: normal normal normal $magnifying-glass-size FontAwesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    position: absolute;
+    top: 50%;
+    @include transform(translateY(-55%));
+    left: $module-search-input-padding;
+    color: $module-search-color;
+  }
+}
+.module-search__input {
+  border: $module-search-input-border;
+  font-size: $module-search-input-font-size;
+  padding: $module-search-input-padding;
+  padding-left: ($module-search-input-padding + $magnifying-glass-size);
+
+  width: 100%;
+}

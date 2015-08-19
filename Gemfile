@@ -29,6 +29,9 @@ gem 'bcrypt', '~> 3.1.7'
 # Use HAML for templating
 gem 'haml-rails'
 
+# Use FontAwesome
+gem 'font-awesome-sass'
+
 # Use Unicorn as the app server
 # gem 'unicorn'
 

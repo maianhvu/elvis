@@ -40,8 +40,8 @@ $(function() {
     },
 
     render: function() { return (
-      <form className="module-search-box" onSubmit={this.handleFormSubmit}>
-        <input type="text" className="search" name="search" ref="searchBox"
+      <form className="module-search__form" onSubmit={this.handleFormSubmit}>
+        <input type="text" className="module-search__input" name="search" ref="searchBox"
           placeholder={this.props.searchBoxPlaceholder}
           onChange={this.handleInputChange}
           onKeyUp={this.handleKeyUp}

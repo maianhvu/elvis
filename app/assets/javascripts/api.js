@@ -99,6 +99,12 @@ $(function() {
     });
   };
 
+  api.prototype.retrieveTimetableData = function(callback) {
+    $.getJSON(APIParameters.url.timetable, function(data) {
+      if (callback && typeof callback === 'function') callback(data);
+    });
+  };
+
   /* Export to Global scope */
   window.API = api;
 

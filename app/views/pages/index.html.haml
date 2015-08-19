@@ -1,14 +1,22 @@
-.top-bar
-  .container
-    #module-search
+.wrapper
+  .screen.screen--layer-1
+    .top-bar
+      .container.restrained
+        #module-search
 
-%section.top-results
-  .container
-    #module-list
+    %section.top-results
+      .container.restrained
+        #module-list
 
-%section.preview
-  .container
-    #module-preview
+    %section.preview
+      .container.restrained
+        #module-preview
+      .container.restrained
+        #timetable-preview
+
+  .screen.screen--layer-2
+    .container.restrained
+      #slot-picker
 
 - content_for :js do
   = javascript_include_tag 'pages/index', 'data-turbolinks-track' => true

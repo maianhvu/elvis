@@ -1,0 +1,79 @@
+//-------------------------------------------------------------------------------------------------
+// COLORS
+//-------------------------------------------------------------------------------------------------
+/* Color definitions */
+$ocean-blue-1: #e2eff1;
+$ocean-blue-2: #b6d5e1;
+$ocean-blue-3: #65799b;
+$ocean-blue-4: #555273;
+
+$vintage-1: #7a9eaf;
+$vintage-2: #655989;
+$vintage-3: #de88a5;
+$vintage-4: #ffcebb;
+
+$sundown-1: #2b2e4a;
+$sundown-2: #e84545;
+$sundown-3: #903749;
+$sundown-4: #53354a;
+
+//-------------------------------------------------------------------------------------------------
+// FONTS
+//-------------------------------------------------------------------------------------------------
+$font-family-default: 'Open Sans', Helvetica, Arial, sans-serif;
+
+/* Weights */
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-semibold: 600;
+$font-weight-extrabold: 800;
+
+//-------------------------------------------------------------------------------------------------
+// BREAKPOINTS
+//-------------------------------------------------------------------------------------------------
+$small-to-medium: 480px;
+$medium-to-large: 1024px;
+
+$small-only: "only screen and (max-width: #{$small-to-medium})";
+$medium-up: "only screen and (min-width: #{$small-to-medium})";
+$large-up: "only screen and (min-width: #{$medium-to-large})";
+
+
+//-------------------------------------------------------------------------------------------------
+// CONTAINER
+//-------------------------------------------------------------------------------------------------
+$container-small-side-padding: .5rem;
+$container-medium-side-padding: 1rem;
+$container-large-side-padding: 0;
+
+//-------------------------------------------------------------------------------------------------
+// RHYTHM
+//-------------------------------------------------------------------------------------------------
+$rhythm-margin: 1rem;
+$rhythm-inch: 3px;
+
+//-------------------------------------------------------------------------------------------------
+// COMPONENTS
+//-------------------------------------------------------------------------------------------------
+/* Module Search */
+$module-search-color: #525252;
+$module-search-input-border: 3px solid $module-search-color;
+$module-search-input-font-size: 1rem;
+$module-search-input-padding: .5rem;
+
+/* Module List */
+$module-list-item-padding: .5rem .75rem;
+
+/* Module Preview */
+$module-preview-item-size: 3.5rem;
+$module-preview-item-colors: (
+  $vintage-1,
+  $vintage-2,
+  $vintage-3,
+  $vintage-4,
+  $sundown-1,
+  $sundown-2,
+  $sundown-3,
+  $sundown-4
+);
+

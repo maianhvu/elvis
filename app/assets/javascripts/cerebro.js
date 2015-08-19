@@ -38,8 +38,8 @@ $(function() {
     // Process outgoing synapses
     if (components.hasOwnProperty('outgoing')) {
       var pulseMethodName = getPulseMethodName(synapse);
-      var pulseMethod = function(value) {
-        this.pulse(synapse, value);
+      var pulseMethod = function(value, bypassRelay) {
+        this.pulse(synapse, value, bypassRelay);
       }.bind(this);
       var outgoingComponents = components.outgoing;
       // If the components passed in is an array
@@ -82,13 +82,13 @@ $(function() {
     }
   };
 
-  cerebro.prototype.pulse = function(synapse, value) {
+  cerebro.prototype.pulse = function(synapse, value, bypassRelay) {
     if (!this.synapses.hasOwnProperty(synapse) || !this.synapses[synapse].hasOwnProperty('incoming') ||
         !this.synapses[synapse].incoming.constructor === Array) return;
     // Get method name by convention
     var methodName = getUpdateMethodName(synapse);
     // Check for relay
-    if (this.synapses[synapse].relay && this.components.hasOwnProperty(this.synapses[synapse].relay)) {
+    if (!bypassRelay && this.synapses[synapse].relay && this.components.hasOwnProperty(this.synapses[synapse].relay)) {
       var relay = this.components[this.synapses[synapse].relay];
       if (value.slice(value.length - 2) === "()") { // if value is a function
         var func = value.substr(0, value.length - 2);

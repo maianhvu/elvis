@@ -1,0 +1,69 @@
+.module-preview {
+  @include display-flex;
+  margin-top: $rhythm-margin;
+  @include side-label("Timetable", $module-preview-item-size);
+}
+
+.module-preview__item {
+  @include display-flex;
+  @include flex-direction(column);
+  @include align-items(center);
+  @include justify-content(center);
+  $size: $module-preview-item-size;
+  width: $size;
+  height: $size;
+  @include border-radius(50%);
+  font-size: 1.25rem;
+
+  position: relative;
+  color: white;
+  margin-right: $rhythm-inch;
+  cursor: pointer;
+
+  @include transition(all 0.25s ease-out 0s);
+
+  overflow: hidden;
+
+  &::after {
+    content: "\f014";
+    display: block;
+    font: normal normal normal 1.5rem FontAwesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    position: absolute;
+    width: $size;
+    height: $size;
+    line-height: $size;
+    text-align: center;
+    -moz-text-align: center;
+
+    top: 100%;
+    background-color: inherit;
+
+    @include transition(all 0.25s ease-out 0s);
+  }
+
+  &.active:after {
+    top: 0%;
+  }
+}
+
+.module-preview__dept,
+.module-preview__code {
+  @include transform(translateY(-.1em))
+}
+
+.module-preview__dept {
+  font-weight: $font-weight-extrabold;
+  height: 1em;
+}
+
+.module-preview__code {
+  font-size: .75rem;
+}
+
+.module-preview__item--empty {
+  line-height: $module-preview-item-size;
+}
